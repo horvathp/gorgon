@@ -19,7 +19,8 @@
 #ifndef PACKET_CHECK_H
 #define PACKET_CHECK_H
 
-int packet_check(uint8_t* pckt, int pckt_len);
+#include <stdint.h>
 
+int packet_check(uint8_t* pckt, int pckt_len);
 
 #endif
