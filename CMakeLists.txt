@@ -88,3 +88,25 @@ target_compile_definitions(atlgnd PRIVATE BUILD_ATL1)
 
 target_link_libraries(atlgnd
     pthread)
+
+add_executable(avg
+    src/demod/avg.c)
+
+add_executable(avgdec
+    src/demod/avgdec.c)
+
+add_executable(cnco
+    src/demod/cnco.c)
+
+add_executable(harddec
+    src/demod/harddec.c)
+
+add_executable(mskdem
+    src/demod/mskdem.c)
+
+add_executable(resample
+    src/demod/resample.c)
+
+add_executable(rtl2cf
+    src/demod/rtl2cf.c)
+

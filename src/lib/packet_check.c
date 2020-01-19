@@ -1,272 +1,324 @@
 /*
  * Decoder and packet interpreter for Smog-P & ATL-1 pocketqube satellites
  * Copyright (C) 2019-2020 szlldm
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "packet_check.h"
 #include <stdint.h>
 #include <string.h>
-#include "packet_check.h"
 
-#define DOWNLINK_PCKT_TYPE_TELEMETRY_1		(1)
-#define DOWNLINK_PCKT_TYPE_TELEMETRY_2		(2)
-#define DOWNLINK_PCKT_TYPE_TELEMETRY_3		(3)
-#define DOWNLINK_PCKT_TYPE_BEACON		(4)
-#define DOWNLINK_PCKT_TYPE_SPECTRUM_RESULT	(5)
-#define DOWNLINK_PCKT_TYPE_FILE_INFO		(6)
-#define DOWNLINK_PCKT_TYPE_FILE_FRAGMENT	(7)
+#define DOWNLINK_PCKT_TYPE_TELEMETRY_1 (1)
+#define DOWNLINK_PCKT_TYPE_TELEMETRY_2 (2)
+#define DOWNLINK_PCKT_TYPE_TELEMETRY_3 (3)
+#define DOWNLINK_PCKT_TYPE_BEACON (4)
+#define DOWNLINK_PCKT_TYPE_SPECTRUM_RESULT (5)
+#define DOWNLINK_PCKT_TYPE_FILE_INFO (6)
+#define DOWNLINK_PCKT_TYPE_FILE_FRAGMENT (7)
 
-#define DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1	(33)
-#define DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2	(34)
+#define DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1 (33)
+#define DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2 (34)
 
-#define DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_1	(129)
-#define DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_2	(130)
-#define DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_3	(131)
+#define DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_1 (129)
+#define DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_2 (130)
+#define DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_3 (131)
 
 
-int packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_1(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_1(uint8_t* pckt, int pckt_len)
 {
-	int i,p;
+    int i, p;
 
-	if (pckt_len != 128) return -1;
+    if (pckt_len != 128)
+        return -1;
 
-	p = 5;
-	for (i=0; i<6; i++) {
-		if (pckt[p+16] & 0x07) return -1;	// check status byte unused lower bits
-		p += 17;
-	}
+    p = 5;
+    for (i = 0; i < 6; i++) {
+        if (pckt[p + 16] & 0x07)
+            return -1; // check status byte unused lower bits
+        p += 17;
+    }
 
-	p = 116;
-	// check last two unused bytes
-	for (i=0; i<2; i++) {
-		if (pckt[p] != 0) return -1;
-		p += 1;
-	}
+    p = 116;
+    // check last two unused bytes
+    for (i = 0; i < 2; i++) {
+        if (pckt[p] != 0)
+            return -1;
+        p += 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_2(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_2(uint8_t* pckt, int pckt_len)
 {
-	int i,p;
+    int i, p;
 
-	if (pckt_len != 128) return -1;
+    if (pckt_len != 128)
+        return -1;
 
-	p = 5;
-	for (i=0; i<2; i++) {
-		if (pckt[p+4] & 0x03) return -1;	// check status byte unused lower bits
-		p += 9;
-	}
-	for (i=0; i<2; i++) {
-		if (pckt[p+16] & 0x0F) return -1;	// check status byte unused lower bits
-		p += 17;
-	}
-	for (i=0; i<2; i++) {
-		if (pckt[p+10] & 0x03) return -1;	// check status byte unused lower bits
-		p += 11;
-	}
-	for (i=0; i<2; i++) {
-		if (pckt[p+12] & 0x3F) return -1;	// check status byte unused lower bits
-		p += 13;
-	}
+    p = 5;
+    for (i = 0; i < 2; i++) {
+        if (pckt[p + 4] & 0x03)
+            return -1; // check status byte unused lower bits
+        p += 9;
+    }
+    for (i = 0; i < 2; i++) {
+        if (pckt[p + 16] & 0x0F)
+            return -1; // check status byte unused lower bits
+        p += 17;
+    }
+    for (i = 0; i < 2; i++) {
+        if (pckt[p + 10] & 0x03)
+            return -1; // check status byte unused lower bits
+        p += 11;
+    }
+    for (i = 0; i < 2; i++) {
+        if (pckt[p + 12] & 0x3F)
+            return -1; // check status byte unused lower bits
+        p += 13;
+    }
 
-	p = 114;
-	// check last four unused bytes
-	for (i=0; i<4; i++) {
-		if (pckt[p] != 0) return -1;
-		p += 1;
-	}
+    p = 114;
+    // check last four unused bytes
+    for (i = 0; i < 4; i++) {
+        if (pckt[p] != 0)
+            return -1;
+        p += 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_3(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_3(uint8_t* pckt, int pckt_len)
 {
-	int i;
-	int16_t i16;
+    int i;
+    int16_t i16;
 
-	if (pckt_len != 128) return -1;
+    if (pckt_len != 128)
+        return -1;
 
-	memcpy(&i16, &pckt[11], sizeof(int16_t));
-	if (i16 != INT16_MAX) return -1;	// value check
+    memcpy(&i16, &pckt[11], sizeof(int16_t));
+    if (i16 != INT16_MAX)
+        return -1; // value check
 
-	if (pckt[17] & 0x07) return -1;	// check status byte unused lower bits
-	if (pckt[22] & 0x03) return -1;	// check status byte unused lower bits
-	if (!((pckt[70] == 1) || (pckt[70] == 0))) return -1;	// valid value check
+    if (pckt[17] & 0x07)
+        return -1; // check status byte unused lower bits
+    if (pckt[22] & 0x03)
+        return -1; // check status byte unused lower bits
+    if (!((pckt[70] == 1) || (pckt[70] == 0)))
+        return -1; // valid value check
 
-	return 0;
+    return 0;
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_BEACON(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_BEACON(uint8_t* pckt, int pckt_len)
 {
-	int i,p;
+    int i, p;
 
-	if (pckt_len != 128) return -1;
+    if (pckt_len != 128)
+        return -1;
 
-	p = 110;
-	// check last eight unused bytes
-	for (i=0; i<8; i++) {
-		if (pckt[p] != 0) return -1;
-		p += 1;
-	}
+    p = 110;
+    // check last eight unused bytes
+    for (i = 0; i < 8; i++) {
+        if (pckt[p] != 0)
+            return -1;
+        p += 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_SPECTRUM_RESULT(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_SPECTRUM_RESULT(uint8_t* pckt, int pckt_len)
 {
-	int i,p;
+    int i, p;
 
-	if (pckt_len != 256) return -1;
+    if (pckt_len != 256)
+        return -1;
 
-	if (pckt[13] > 9) return -1;	// value check
-	p = 18;
-	// check unused bytes
-	for (i=0; i<2; i++) {
-		if (pckt[p] != 0) return -1;
-		p += 1;
-	}
+    if (pckt[13] > 9)
+        return -1; // value check
+    p = 18;
+    // check unused bytes
+    for (i = 0; i < 2; i++) {
+        if (pckt[p] != 0)
+            return -1;
+        p += 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_FILE_INFO(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_FILE_INFO(uint8_t* pckt, int pckt_len)
 {
-	int i,p;
+    int i, p;
 
-	if (pckt_len != 128) return -1;
+    if (pckt_len != 128)
+        return -1;
 
-	p = 5;
-	for (i=0; i<5; i++) {
-		if (pckt[p+4] != 0) return -1;	// value check
-		p += 21;
-	}
+    p = 5;
+    for (i = 0; i < 5; i++) {
+        if (pckt[p + 4] != 0)
+            return -1; // value check
+        p += 21;
+    }
 
-	return 0;
+    return 0;
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_FILE_FRAGMENT(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_FILE_FRAGMENT(uint8_t* pckt, int pckt_len)
 {
-	int i,p;
+    int i, p;
 
-	if (pckt_len != 256) return -1;
+    if (pckt_len != 256)
+        return -1;
 
-	if (pckt[12] != 0) return -1;	// value check
+    if (pckt[12] != 0)
+        return -1; // value check
 
-	uint16_t pckt_index, pckt_cnt;
-	uint32_t file_size;
+    uint16_t pckt_index, pckt_cnt;
+    uint32_t file_size;
 
-	memcpy(&pckt_index, &pckt[5], 2);
-	memcpy(&pckt_cnt, &pckt[7], 2);
+    memcpy(&pckt_index, &pckt[5], 2);
+    memcpy(&pckt_cnt, &pckt[7], 2);
 
-	file_size = 0;
-	file_size += pckt[12];
-	file_size <<= 8;
-	file_size += pckt[13];
-	file_size <<= 8;
-	file_size += pckt[14];
+    file_size = 0;
+    file_size += pckt[12];
+    file_size <<= 8;
+    file_size += pckt[13];
+    file_size <<= 8;
+    file_size += pckt[14];
 
-	// max file size: 217*128 = 27776 == 27.125kB
-	if (pckt_cnt == 0) return -1;
-	if (pckt_cnt > 128) return -1;
-	if (pckt_index >= pckt_cnt) return -1;
-	if ((file_size / 217) > pckt_cnt) return -1;
-	if (((file_size / 217) + 1) < pckt_cnt) return -1;
+    // max file size: 217*128 = 27776 == 27.125kB
+    if (pckt_cnt == 0)
+        return -1;
+    if (pckt_cnt > 128)
+        return -1;
+    if (pckt_index >= pckt_cnt)
+        return -1;
+    if ((file_size / 217) > pckt_cnt)
+        return -1;
+    if (((file_size / 217) + 1) < pckt_cnt)
+        return -1;
 
-	return 0;
+    return 0;
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1(uint8_t* pckt, int pckt_len)
 {
-	int i,p;
+    int i, p;
 
-	if (pckt_len != 128) return -1;
+    if (pckt_len != 128)
+        return -1;
 
-	if (!((pckt[9] == '1') || (pckt[9] == '0'))) return -1;		// valid value check
-	if (!((pckt[10] == 'E') || (pckt[10] == 'I'))) return -1;	// valid value check
-	if (!((pckt[11] == 'V') || (pckt[11] == 'N'))) return -1;	// valid value check
-	if (!((pckt[63] == 2) || (pckt[63] == 1))) return -1;		// valid value check
-	// check unused byte
-	p = 117;
-	if (pckt[p] != 0) return -1;	// value check
+    if (!((pckt[9] == '1') || (pckt[9] == '0')))
+        return -1; // valid value check
+    if (!((pckt[10] == 'E') || (pckt[10] == 'I')))
+        return -1; // valid value check
+    if (!((pckt[11] == 'V') || (pckt[11] == 'N')))
+        return -1; // valid value check
+    if (!((pckt[63] == 2) || (pckt[63] == 1)))
+        return -1; // valid value check
+    // check unused byte
+    p = 117;
+    if (pckt[p] != 0)
+        return -1; // value check
 
-	return 0;
+    return 0;
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2(uint8_t* pckt, int pckt_len)
 {
-	int i,p;
+    int i, p;
 
-	if (pckt_len != 128) return -1;
+    if (pckt_len != 128)
+        return -1;
 
-	if (!((pckt[1] == 'V') || (pckt[1] == 'N'))) return -1;	// valid value check
-	p = 116;
-	// check unused bytes
-	for (i=0; i<2; i++) {
-		if (pckt[p] != 0) return -1;
-		p += 1;
-	}
+    if (!((pckt[1] == 'V') || (pckt[1] == 'N')))
+        return -1; // valid value check
+    p = 116;
+    // check unused bytes
+    for (i = 0; i < 2; i++) {
+        if (pckt[p] != 0)
+            return -1;
+        p += 1;
+    }
 
-	return 0;
+    return 0;
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_1(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_1(uint8_t* pckt, int pckt_len)
 {
-	return packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1(pckt, pckt_len);
+    return packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1(pckt, pckt_len);
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_2(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_2(uint8_t* pckt, int pckt_len)
 {
-	return packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2(pckt, pckt_len);
+    return packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2(pckt, pckt_len);
 }
 
-int packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_3(uint8_t * pckt, int pckt_len)
+int packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_3(uint8_t* pckt, int pckt_len)
 {
-	int i,p;
+    int i, p;
 
-	if (pckt_len != 128) return -1;
+    if (pckt_len != 128)
+        return -1;
 
-	p = 85;
-	// check unused bytes
-	for (i=0; i<33; i++) {
-		if (pckt[p] != 0) return -1;
-		p += 1;
-	}
+    p = 85;
+    // check unused bytes
+    for (i = 0; i < 33; i++) {
+        if (pckt[p] != 0)
+            return -1;
+        p += 1;
+    }
 
-	return 0;
+    return 0;
 }
 
 
-int packet_check(uint8_t * pckt, int pckt_len)
+int packet_check(uint8_t* pckt, int pckt_len)
 {
-	if (pckt_len < 128) return -1;
+    if (pckt_len < 128)
+        return -1;
 
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_TELEMETRY_1) return packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_1(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_TELEMETRY_2) return packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_2(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_TELEMETRY_3) return packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_3(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_BEACON) return packet_check_DOWNLINK_PCKT_TYPE_BEACON(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_SPECTRUM_RESULT) return packet_check_DOWNLINK_PCKT_TYPE_SPECTRUM_RESULT(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_FILE_INFO) return packet_check_DOWNLINK_PCKT_TYPE_FILE_INFO(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_FILE_FRAGMENT) return packet_check_DOWNLINK_PCKT_TYPE_FILE_FRAGMENT(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1) return packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2) return packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_1) return packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_1(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_2) return packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_2(pckt, pckt_len);
-	if (pckt[0] == DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_3) return packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_3(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_TELEMETRY_1)
+        return packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_1(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_TELEMETRY_2)
+        return packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_2(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_TELEMETRY_3)
+        return packet_check_DOWNLINK_PCKT_TYPE_TELEMETRY_3(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_BEACON)
+        return packet_check_DOWNLINK_PCKT_TYPE_BEACON(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_SPECTRUM_RESULT)
+        return packet_check_DOWNLINK_PCKT_TYPE_SPECTRUM_RESULT(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_FILE_INFO)
+        return packet_check_DOWNLINK_PCKT_TYPE_FILE_INFO(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_FILE_FRAGMENT)
+        return packet_check_DOWNLINK_PCKT_TYPE_FILE_FRAGMENT(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1)
+        return packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_1(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2)
+        return packet_check_DOWNLINK_PCKT_TYPE_SMOGP_TELEMETRY_2(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_1)
+        return packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_1(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_2)
+        return packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_2(pckt, pckt_len);
+    if (pckt[0] == DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_3)
+        return packet_check_DOWNLINK_PCKT_TYPE_ATL_TELEMETRY_3(pckt, pckt_len);
 
-	return -1;
+    return -1;
 }
 
 
@@ -300,6 +352,3 @@ int packet_check(uint8_t * pckt, int pckt_len)
 /*	}*/
 
 /*}*/
-
-
-
