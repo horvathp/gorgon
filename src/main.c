@@ -63,7 +63,7 @@ typedef int pthread_spinlock_t;
 
 int pthread_spin_init(pthread_spinlock_t* lock, int pshared)
 {
-    ucs_memory_cpu_fence();
+    __asm__ __volatile__ ("" ::: "memory");
     *lock = 0;
     return 0;
 }
@@ -82,7 +82,7 @@ int pthread_spin_lock(pthread_spinlock_t* lock)
 
 int pthread_spin_unlock(pthread_spinlock_t* lock)
 {
-    ucs_memory_cpu_fence();
+    __asm__ __volatile__ ("" ::: "memory");
     *lock = 0;
     return 0;
 }
@@ -307,7 +307,9 @@ int block_fifo_init(block_fifo_t* fifo, unsigned int elem_size, unsigned int fif
     if (pthread_mutex_init(&fifo->fifo_mutex, NULL) != 0)
         return -1;
     pthread_condattr_init(&attr);
+#ifndef __APPLE__
     pthread_condattr_setclock(&attr, CLOCK_MONOTONIC);
+#endif
     if (pthread_cond_init(&fifo->fifo_cond, &attr) != 0)
         return -1;
     if ((fifo->fifo_storage = calloc(fifo->fifo_size, fifo->elem_size)) == NULL)
