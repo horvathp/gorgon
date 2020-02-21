@@ -66,7 +66,7 @@ add_executable(smogpgnd
 target_compile_definitions(smogpgnd PRIVATE BUILD_SMOGP)
 
 target_link_libraries(smogpgnd
-    pthread)
+    pthread m)
 
 add_executable(atlgnd
     src/main.c
@@ -87,7 +87,7 @@ add_executable(atlgnd
 target_compile_definitions(atlgnd PRIVATE BUILD_ATL1)
 
 target_link_libraries(atlgnd
-    pthread)
+    pthread m)
 
 add_executable(rtl2cf
     src/demod/rtl2cf.c)
